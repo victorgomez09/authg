@@ -1,17 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom"
-import { getCurrentUser } from "../services/auth.service"
+
 import useAuthStore from "../stores/user.store";
 
 export const PrivateRoute = () => {
-    const { setUser } = useAuthStore(state => ({setUser: state.setUser}))
+    const [user] = useAuthStore(state => [state.user])
 
-    getCurrentUser()
-    .then(response => {
-        setUser(response)
+    if (user != null && user.email && user.name)
         return <Outlet />
-    }).catch(error => {
-        console.log('error', error)
-    });
 
     return <Navigate to="/auth" />
 }

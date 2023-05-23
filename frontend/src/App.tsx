@@ -5,8 +5,18 @@ import { PrivateRoute } from './routes/private.route'
 import Home from './views/home.view'
 import Auth from './views/auth.view'
 import NotFound from './views/not-found.view'
+import { useEffect } from 'react'
+import { getCurrentUser } from './services/auth.service'
+import useAuthStore from './stores/user.store'
 
 function App() {
+  const [setUser] = useAuthStore(state => [state.setUser, state.user])
+
+  useEffect(() => {
+    getCurrentUser().then((data) => {
+      setUser(data)
+    })
+  }, [setUser])
 
   return (
     <Routes>
@@ -16,7 +26,7 @@ function App() {
 
       <Route path="/auth" element={<Auth />} />
 
-      <Route path='*' element={<NotFound />}/>
+      <Route path='*' element={<NotFound />} />
     </Routes>
   )
 }

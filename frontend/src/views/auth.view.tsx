@@ -15,10 +15,14 @@ import {
 } from '@mantine/core';
 
 import { FacebookButton, GithubButton, GoogleButton } from '../components/social-buttons';
-import { FACEBOOK_AUTH_URL, GITHUB_AUTH_URL, GOOGLE_AUTH_URL } from '../constants';
-import { login, register } from '../services/auth.service';
+import { ACCESS_TOKEN, FACEBOOK_AUTH_URL, GITHUB_AUTH_URL, GOOGLE_AUTH_URL } from '../constants';
+import { getCurrentUser, login, register } from '../services/auth.service';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../stores/user.store';
 
 export default function Auth() {
+  const navigate = useNavigate();
+  const [setUser] = useAuthStore(state => [state.setUser])
   const [type, toggle] = useToggle(['login', 'register']);
   const form = useForm({
     initialValues: {
@@ -34,15 +38,19 @@ export default function Auth() {
     },
   });
 
-  const handleForm = (data: {
+  const handleForm = async (data: {
     email: string;
     name: string;
     password: string;
     terms: boolean;
   }) => {
-    if (type === 'login')
-      login({ email: data.email, password: data.password });
-    else
+    if (type === 'login') {
+      const loginResponse = await login({ email: data.email, password: data.password });
+      localStorage.setItem(ACCESS_TOKEN, loginResponse.accessToken)
+      const user = await getCurrentUser();
+      setUser(user);
+      navigate("/")
+    } else
       register(data)
   }
 
