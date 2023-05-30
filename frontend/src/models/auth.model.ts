@@ -1,8 +1,11 @@
-import { IUser } from "./user.model";
-
 export interface ILogin {
     email: string;
     password: string;
+}
+
+export interface ILoggedIn {
+    accessToken: string;
+    tokenType: string
 }
 
 export interface IRegister {
@@ -11,8 +14,7 @@ export interface IRegister {
     password: string;
 }
 
-export interface ILoggedIn {
-    access_token: string;
-    refresh_token: string;
-    user: IUser
+export interface IRegistered {
+    success: boolean;
+    message: string;
 }

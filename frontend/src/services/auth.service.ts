@@ -1,5 +1,5 @@
 import { ACCESS_TOKEN, API_BASE_URL } from "../constants";
-import { ILogin, IRegister } from "../models/auth.model";
+import { ILoggedIn, ILogin, IRegister, IRegistered } from "../models/auth.model";
 
 const request = (options: any) => {
     const headers = new Headers({
@@ -32,7 +32,7 @@ export function getCurrentUser() {
     });
 }
 
-export function login(loginRequest: ILogin) {
+export function login(loginRequest: ILogin): Promise<ILoggedIn> {
     return request({
         url: API_BASE_URL + "/auth/login",
         method: 'POST',
@@ -40,7 +40,7 @@ export function login(loginRequest: ILogin) {
     });
 }
 
-export function register(registerRequest: IRegister) {
+export function register(registerRequest: IRegister): Promise<IRegistered> {
     return request({
         url: API_BASE_URL + "/auth/signup",
         method: 'POST',

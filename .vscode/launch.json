@@ -2,27 +2,10 @@
     "configurations": [
         {
             "type": "java",
-            "name": "AuthgBackendApplication",
+            "name": "Spring Boot-AuthgBackendApplication<authg>",
             "request": "launch",
+            "cwd": "${workspaceFolder}",
             "mainClass": "com.vira.authg.AuthgBackendApplication",
-            "projectName": "authg"
-        },
-        {
-            "type": "java",
-            "name": "Spring Boot-SpringSocialApplication<spring-social>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.vira.authg.SpringSocialApplication",
-            "projectName": "spring-social",
-            "args": "",
-            "envFile": "${workspaceFolder}/.env"
-        },
-        {
-            "type": "java",
-            "name": "Spring Boot-SpringSocialApplication<authg>",
-            "request": "launch",
-            "cwd": "${workspaceFolder}",
-            "mainClass": "com.vira.authg.SpringSocialApplication",
             "projectName": "authg",
             "args": "",
             "envFile": "${workspaceFolder}/.env"

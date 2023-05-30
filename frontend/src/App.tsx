@@ -1,13 +1,14 @@
+import { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
-import './App.css'
 import { PrivateRoute } from './routes/private.route'
-import Home from './views/home.view'
-import Auth from './views/auth.view'
-import NotFound from './views/not-found.view'
-import { useEffect } from 'react'
 import { getCurrentUser } from './services/auth.service'
 import useAuthStore from './stores/user.store'
+import Home from './views/home.view'
+import Login from './views/login.view'
+import Register from './views/register.view'
+import NotFound from './views/not-found.view'
+import { OAuth2RedirectHandler } from './components/oauth2-redirect-handler.component'
 
 function App() {
   const [setUser] = useAuthStore(state => [state.setUser, state.user])
@@ -24,7 +25,10 @@ function App() {
         <Route path='/' element={<Home />} />
       </Route>
 
-      <Route path="/auth" element={<Auth />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />}></Route>
 
       <Route path='*' element={<NotFound />} />
     </Routes>
