@@ -2,23 +2,18 @@ package com.vira.authg.util;
 
 import java.util.Random;
 
-import javax.servlet.ServletContext;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Component
 public class ApplicationUtils {
-
-    @Autowired
-    private ServletContext context;
 
     String upperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     String lowerAlphabet = "abcdefghijklmnopqrstuvwxyz";
     String numbers = "0123456789";
 
     public String generateApplicationDomain() {
-        return context.getContextPath();
+        return ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
     }
 
     public String generateApplicationClientId() {
@@ -27,7 +22,7 @@ public class ApplicationUtils {
 
         String alphaNumeric = upperAlphabet + lowerAlphabet + numbers;
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             int index = random.nextInt(alphaNumeric.length());
             char randomChar = alphaNumeric.charAt(index);
             sb.append(randomChar);
@@ -42,7 +37,7 @@ public class ApplicationUtils {
 
         String alphaNumeric = upperAlphabet + lowerAlphabet + numbers;
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 35; i++) {
             int index = random.nextInt(alphaNumeric.length());
             char randomChar = alphaNumeric.charAt(index);
             sb.append(randomChar);

@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vira.authg.dto.ApplicationAuthorizationDto;
 import com.vira.authg.dto.ApplicationCreateDto;
 import com.vira.authg.dto.ApplicationDto;
 import com.vira.authg.dto.ApplicationUpdateDto;
+import com.vira.authg.security.CurrentUser;
+import com.vira.authg.security.UserPrincipal;
 import com.vira.authg.service.ApplicationService;
 
 @RestController
@@ -35,9 +38,15 @@ public class ApplicationController {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
+    @PostMapping("/authorize")
+    public ResponseEntity<ApplicationAuthorizationDto> authorize(@RequestBody ApplicationAuthorizationDto data) {
+        return ResponseEntity.ok().body(service.authorize(data));
+    }
+
     @PostMapping()
-    public ResponseEntity<ApplicationDto> create(@RequestBody ApplicationCreateDto data) {
-        return ResponseEntity.ok().body(service.create(data));
+    public ResponseEntity<ApplicationDto> create(@RequestBody ApplicationCreateDto data,
+            @CurrentUser UserPrincipal userPrincipal) {
+        return ResponseEntity.ok().body(service.create(data, userPrincipal.getId()));
     }
 
     @PutMapping()
