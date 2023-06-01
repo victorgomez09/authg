@@ -1,8 +1,11 @@
 package com.vira.authg.model;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -39,5 +42,13 @@ public class User {
     private AuthProvider provider;
 
     private String providerId;
-    
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "user_applications", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
+            @JoinColumn(name = "application_id") })
+    private List<Application> applications;
+
 }
