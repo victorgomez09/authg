@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vira.authg.dto.ApplicationAuthorizationDto;
@@ -28,9 +29,9 @@ public class ApplicationController {
     @Autowired
     private ApplicationService service;
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ApplicationDto>> findAllByUser(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok().body(service.findAllByUser(userId));
+    @GetMapping("/user")
+    public ResponseEntity<List<ApplicationDto>> findAllByUser(@RequestParam String email) {
+        return ResponseEntity.ok().body(service.findAllByUser(email));
     }
 
     @GetMapping("/{id}")

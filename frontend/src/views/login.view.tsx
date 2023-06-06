@@ -39,7 +39,7 @@ export default function Login() {
         </div>
       )}
       <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content text-center w-12/12 md:w-6/12 xl:w-4/12">
+        <div className="hero-content text-center w-12/12 md:w-6/12 lg:w-5/12 xl:w-4/12">
           <div className="card w-full bg-base-100 shadow-md">
             <div className="card-body">
               <h2 className="card-title text-center inline">Welcome</h2>

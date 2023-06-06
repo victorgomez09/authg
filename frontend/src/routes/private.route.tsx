@@ -1,4 +1,4 @@
-import { Link, NavLink, Navigate, Outlet } from "react-router-dom"
+import { NavLink, Navigate, Outlet } from "react-router-dom"
 
 import useAuthStore from "../stores/user.store";
 import { Navbar } from "../components/navbar.component";
@@ -10,18 +10,16 @@ export const PrivateRoute = () => {
         return (
             <div className="flex flex-col h-full">
                 <Navbar />
-                <div className="drawer drawer-mobile h-full">
+                <div className="drawer lg:drawer-open">
                     <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-                    <div className="drawer-content flex flex-col">
+                    <div className="drawer-content flex flex-1 flex-col p-4 mt-16 bg-base-200">
                         <label htmlFor="my-drawer-2" className="btn btn-primary drawer-button lg:hidden">Open drawer</label>
-                        <div className="py-2 px-4">
-                            <Outlet />
-                        </div>
-                    </div>
 
-                    <div className="drawer-side shadow-xl border-r z-40">
+                        <Outlet />
+                    </div>
+                    <div className="drawer-side bg-base-100 shadow-md">
                         <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
-                        <ul className="menu p-4 w-60 bg-base-100 text-base-content">
+                        <ul className="menu px-4 w-80 text-base-content mt-16">
                             <li><NavLink to="/" className={({ isActive }) => (isActive ? 'active' : '')}>Dashboard</NavLink></li>
                             <li><NavLink to="/organizations" className={({ isActive }) => (isActive ? 'active' : '')}>Organizations</NavLink></li>
                             <li><NavLink to="/applications" className={({ isActive }) => (isActive ? 'active' : '')}>Applications</NavLink></li>

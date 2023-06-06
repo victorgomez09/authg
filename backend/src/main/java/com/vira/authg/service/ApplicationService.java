@@ -12,7 +12,7 @@ public interface ApplicationService {
 
     ApplicationDto findByClientId(String clientId);
 
-    List<ApplicationDto> findAllByUser(Long user);
+    List<ApplicationDto> findAllByUser(String userEmail);
 
     ApplicationAuthorizationDto authorize(ApplicationAuthorizationDto data);
 

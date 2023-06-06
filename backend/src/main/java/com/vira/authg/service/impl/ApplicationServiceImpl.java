@@ -25,110 +25,111 @@ import com.vira.authg.util.ApplicationUtils;
 @Service
 public class ApplicationServiceImpl implements ApplicationService {
 
-    @Autowired
-    private ApplicationRepository repository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ApplicationUtils utils;
+        @Autowired
+        private ApplicationRepository repository;
+        @Autowired
+        private UserRepository userRepository;
+        @Autowired
+        private ApplicationUtils utils;
 
-    @Override
-    public ApplicationDto findById(Long id) {
-        Application app = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Application", "id", id));
+        @Override
+        public ApplicationDto findById(Long id) {
+                Application app = repository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException("Application", "id", id));
 
-        return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
-                .type(app.getType()).signingAlgorithm(app.getSigningAlgorithm())
-                .identifier(app.getIdentifier()).tokenExpiration(app.getTokenExpiration())
-                .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
-                .owner(app.getOwner())
-                .creationDate(app.getCreationDate()).build();
-    }
-
-    @Override
-    public List<ApplicationDto> findAllByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
-
-        return repository.findByOwner(user).stream()
-                .map(app -> ApplicationDto.builder().id(app.getId()).name(app.getName())
-                        .type(app.getType())
-                        .signingAlgorithm(app.getSigningAlgorithm())
-                        .description(app.getDescription())
-                        .identifier(app.getIdentifier())
-                        .tokenExpiration(app.getTokenExpiration())
-                        .domain(app.getDomain()).clientId(app.getClientId())
-                        .clientSecret(app.getClientSecret())
-                        .owner(app.getOwner())
-                        .creationDate(app.getCreationDate()).build())
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public ApplicationDto findByClientId(String clientId) {
-        Application app = repository.findByClientId(clientId)
-                .orElseThrow(() -> new ResourceNotFoundException("Application", "clientId", clientId));
-
-        return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
-                .identifier(app.getIdentifier()).tokenExpiration(app.getTokenExpiration())
-                .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
-                .owner(app.getOwner())
-                .creationDate(app.getCreationDate()).build();
-    }
-
-    @Override
-    public ApplicationAuthorizationDto authorize(ApplicationAuthorizationDto data) {
-        Application app = repository.findByClientId(data.getClientId())
-                .orElseThrow(() -> new ResourceNotFoundException("Application", "clientId", data.getClientId()));
-
-        if (!app.getClientSecret().equals(data.getClientSecret())) {
-            throw new ApplicationAuthorizationException(app.getClientId(), app.getClientSecret());
+                return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
+                                .type(app.getType()).signingAlgorithm(app.getSigningAlgorithm())
+                                .identifier(app.getIdentifier()).tokenExpiration(app.getTokenExpiration())
+                                .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
+                                .owner(app.getOwner())
+                                .creationDate(app.getCreationDate()).build();
         }
 
-        return ApplicationAuthorizationDto.builder().name(app.getName()).clientId(data.getClientId())
-                .clientSecret(data.getClientSecret()).build();
-    }
+        @Override
+        public List<ApplicationDto> findAllByUser(String userEmail) {
+                User user = userRepository.findByEmail(userEmail)
+                                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userEmail));
 
-    @Override
-    public ApplicationDto create(ApplicationCreateDto data, Long userId) {
-        repository.findByName(data.getName()).ifPresent(user1 -> {
-            throw new ResourceDuplicateException("Application", "name", data.getName());
-        });
+                return repository.findByOwner(user).stream()
+                                .map(app -> ApplicationDto.builder().id(app.getId()).name(app.getName())
+                                                .type(app.getType())
+                                                .signingAlgorithm(app.getSigningAlgorithm())
+                                                .description(app.getDescription())
+                                                .identifier(app.getIdentifier())
+                                                .tokenExpiration(app.getTokenExpiration())
+                                                .domain(app.getDomain()).clientId(app.getClientId())
+                                                .clientSecret(app.getClientSecret())
+                                                .owner(app.getOwner())
+                                                .creationDate(app.getCreationDate()).build())
+                                .collect(Collectors.toList());
+        }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        @Override
+        public ApplicationDto findByClientId(String clientId) {
+                Application app = repository.findByClientId(clientId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Application", "clientId", clientId));
 
-        Application app = repository
-                .save(Application.builder().name(data.getName()).description(data.getDescription())
-                        .identifier(data.getIdentifier())
-                        .type(ApplicationType.valueOf(data.getType()))
-                        .signingAlgorithm(SigningAlgorithm.valueOf(data.getSigningAlgorithm()))
-                        .tokenExpiration(data.getTokenExpiration())
-                        .domain(utils.generateApplicationDomain())
-                        .clientId(utils.generateApplicationClientId())
-                        .clientSecret(utils.generateApplicationClientSecret())
-                        .owner(user)
-                        .build());
+                return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
+                                .identifier(app.getIdentifier()).tokenExpiration(app.getTokenExpiration())
+                                .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
+                                .owner(app.getOwner())
+                                .creationDate(app.getCreationDate()).build();
+        }
 
-        return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
-                .identifier(app.getIdentifier()).type(app.getType())
-                .tokenExpiration(app.getTokenExpiration())
-                .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
-                .owner(app.getOwner())
-                .creationDate(app.getCreationDate()).build();
-    }
+        @Override
+        public ApplicationAuthorizationDto authorize(ApplicationAuthorizationDto data) {
+                Application app = repository.findByClientId(data.getClientId())
+                                .orElseThrow(() -> new ResourceNotFoundException("Application", "clientId",
+                                                data.getClientId()));
 
-    @Override
-    public ApplicationDto update(ApplicationUpdateDto data) {
-        ;
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
+                if (!app.getClientSecret().equals(data.getClientSecret())) {
+                        throw new ApplicationAuthorizationException(app.getClientId(), app.getClientSecret());
+                }
 
-    @Override
-    public Void delete(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
+                return ApplicationAuthorizationDto.builder().name(app.getName()).clientId(data.getClientId())
+                                .clientSecret(data.getClientSecret()).build();
+        }
+
+        @Override
+        public ApplicationDto create(ApplicationCreateDto data, Long userId) {
+                repository.findByName(data.getName()).ifPresent(user1 -> {
+                        throw new ResourceDuplicateException("Application", "name", data.getName());
+                });
+
+                User user = userRepository.findById(userId)
+                                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+                Application app = repository
+                                .save(Application.builder().name(data.getName()).description(data.getDescription())
+                                                .identifier(data.getIdentifier())
+                                                .type(ApplicationType.valueOf(data.getType()))
+                                                .signingAlgorithm(SigningAlgorithm.valueOf(data.getSigningAlgorithm()))
+                                                .tokenExpiration(data.getTokenExpiration())
+                                                .domain(utils.generateApplicationDomain())
+                                                .clientId(utils.generateApplicationClientId())
+                                                .clientSecret(utils.generateApplicationClientSecret())
+                                                .owner(user)
+                                                .build());
+
+                return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
+                                .identifier(app.getIdentifier()).type(app.getType())
+                                .tokenExpiration(app.getTokenExpiration())
+                                .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
+                                .owner(app.getOwner())
+                                .creationDate(app.getCreationDate()).build();
+        }
+
+        @Override
+        public ApplicationDto update(ApplicationUpdateDto data) {
+                ;
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'update'");
+        }
+
+        @Override
+        public Void delete(Long id) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        }
 
 }
