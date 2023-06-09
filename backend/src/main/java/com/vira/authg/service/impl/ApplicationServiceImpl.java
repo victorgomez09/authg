@@ -3,6 +3,8 @@ package com.vira.authg.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import com.vira.authg.model.SigningAlgorithm;
 import com.vira.authg.model.User;
 import com.vira.authg.repository.ApplicationRepository;
 import com.vira.authg.repository.UserRepository;
+import com.vira.authg.security.TokenProvider;
 import com.vira.authg.service.ApplicationService;
 import com.vira.authg.util.ApplicationUtils;
 
@@ -31,6 +34,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         private UserRepository userRepository;
         @Autowired
         private ApplicationUtils utils;
+        @Autowired
+        private TokenProvider tokenProvider;
 
         @Override
         public ApplicationDto findById(Long id) {
@@ -77,17 +82,17 @@ public class ApplicationServiceImpl implements ApplicationService {
         }
 
         @Override
-        public ApplicationAuthorizationDto authorize(ApplicationAuthorizationDto data) {
-                Application app = repository.findByClientId(data.getClientId())
-                                .orElseThrow(() -> new ResourceNotFoundException("Application", "clientId",
-                                                data.getClientId()));
+        public Boolean authorize(HttpServletRequest request) {
+                // Application app = repository.findByClientId(data.getClientId())
+                // .orElseThrow(() -> new ResourceNotFoundException("Application", "clientId",
+                // data.getClientId()));
 
-                if (!app.getClientSecret().equals(data.getClientSecret())) {
-                        throw new ApplicationAuthorizationException(app.getClientId(), app.getClientSecret());
-                }
+                // if (!app.getClientSecret().equals(data.getClientSecret())) {
+                // throw new ApplicationAuthorizationException(app.getClientId(),
+                // app.getClientSecret());
+                // }
 
-                return ApplicationAuthorizationDto.builder().name(app.getName()).clientId(data.getClientId())
-                                .clientSecret(data.getClientSecret()).build();
+                return tokenProvider.validateToken(tokenProvider.getJwtFromRequest(null));
         }
 
         @Override

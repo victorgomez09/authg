@@ -12,6 +12,7 @@ import Register from './views/register.view'
 import NotFound from './views/not-found.view'
 import Applications from './views/applications.view'
 import ApplicationsCreate from './views/applications-create.view'
+import ApplicationDetails from './views/applications-details.view'
 
 function App() {
   const queryClient = new QueryClient()
@@ -30,6 +31,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/applications' element={<Applications />} />
           <Route path='/applications/create' element={<ApplicationsCreate />} />
+          <Route path='/applications/:id' element={<ApplicationDetails />} />
         </Route>
 
         <Route path="/login" element={<Login />} />

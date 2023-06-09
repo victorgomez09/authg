@@ -6,6 +6,9 @@ export interface IApplication {
     identifier: string;
     signingAlgorithm: "RS256" | "HS256";
     tokenExpiration: number;
+    domain: string;
+    clientId: string;
+    clientSecret: string;
 }
 
 export interface ICreateApplication {

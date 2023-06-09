@@ -9,6 +9,14 @@ export async function findAppsByUser(userEmail = "") {
     });
 }
 
+export async function findAppById(id = "") {
+    return await request<IApplication>({
+        url: API_BASE_URL + `/api/v1/application/${id}`,
+        method: 'GET',
+    });
+}
+
+
 export async function createApp(applicationData: ICreateApplication): Promise<IApplication> {
     return await request<IApplication>({
         url: API_BASE_URL + "/api/v1/application",

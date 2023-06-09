@@ -54,7 +54,7 @@ export default function Home() {
                                     return (
                                         <tr className="hover" key={index}>
                                             <th>{index}</th>
-                                            <td><Link to={`/applications/${app.name}`} className="hover:text-primary cursor-pointer">{app.name}</Link></td>
+                                            <td><Link to={`/applications/${app.id}`} className="hover:text-primary cursor-pointer">{app.name}</Link></td>
                                             <td>{app.description}</td>
                                             <td>{app.identifier}</td>
                                             <td><div className={`badge badge-${app.type === "API" ? "secondary" : "accent"}`}>{app.type}</div></td>

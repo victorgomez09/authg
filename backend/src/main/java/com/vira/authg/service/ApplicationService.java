@@ -2,7 +2,8 @@ package com.vira.authg.service;
 
 import java.util.List;
 
-import com.vira.authg.dto.ApplicationAuthorizationDto;
+import javax.servlet.http.HttpServletRequest;
+
 import com.vira.authg.dto.ApplicationCreateDto;
 import com.vira.authg.dto.ApplicationDto;
 import com.vira.authg.dto.ApplicationUpdateDto;
@@ -14,7 +15,7 @@ public interface ApplicationService {
 
     List<ApplicationDto> findAllByUser(String userEmail);
 
-    ApplicationAuthorizationDto authorize(ApplicationAuthorizationDto data);
+    Boolean authorize(HttpServletRequest request);
 
     ApplicationDto create(ApplicationCreateDto data, Long userId);
 

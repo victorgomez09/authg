@@ -8,7 +8,11 @@ export default function Applications() {
     const [user] = useAuthStore(state => [state.user])
     const { data, isLoading, error } = useCustomQuery<string | undefined, IApplication[]>(["findApplicationsByUser"], () => findAppsByUser(user?.email), user?.email)
 
-    if (isLoading) return <div>Loading...</div>
+    if (isLoading) return (
+        <div className="flex flex-1 items-center justify-center">
+            <span className="loading loading-dots loading-lg"></span>
+        </div>
+    )
 
     return (
         <>
@@ -28,41 +32,45 @@ export default function Applications() {
                 <Link to="/applications/create" className="btn btn-primary">Create application</Link>
             </div>
 
-            {data?.length ? (
-                <div className="mt-10">
-                    <div className="overflow-x-auto">
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Identifier</th>
-                                    <th>Type</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data?.map((app, index) => {
-                                    return (
-                                        <tr className="hover" key={index}>
-                                            <th>{index}</th>
-                                            <td><Link to={`/applications/${app.name}`} className="hover:text-primary cursor-pointer">{app.name}</Link></td>
-                                            <td>{app.description}</td>
-                                            <td>{app.identifier}</td>
-                                            <td><div className={`badge ${app.type === "API" ? "badge-secondary" : "badge-accent"}`}>{app.type}</div></td>
+            <div className="card bg-base-100 shadow-md w-full h-full mt-5">
+                <div className="card-body overflow-auto">
+                    {data?.length ? (
+                        <div className="mt-10">
+                            <div className="overflow-x-auto">
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Identifier</th>
+                                            <th>Type</th>
                                         </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
+                                    </thead>
+                                    <tbody>
+                                        {data?.map((app, index) => {
+                                            return (
+                                                <tr className="hover" key={index}>
+                                                    <th>{index}</th>
+                                                    <td><Link to={`/applications/${app.id}`} className="hover:text-primary cursor-pointer">{app.name}</Link></td>
+                                                    <td>{app.description}</td>
+                                                    <td>{app.identifier}</td>
+                                                    <td><div className={`badge ${app.type === "API" ? "badge-secondary" : "badge-accent"}`}>{app.type}</div></td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
 
+                        </div>
+                    ) : (
+                        <div className="mt-10">
+                            <span>No applications created, create new <Link to="/applications/create" className="link link-primary">here</Link></span>
+                        </div>
+                    )}
                 </div>
-            ) : (
-                <div className="mt-10">
-                    <span>No applications created, create new <Link to="/applications/create" className="link link-primary">here</Link></span>
-                </div>
-            )}
+            </div>
         </>
     )
 }

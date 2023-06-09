@@ -1,6 +1,7 @@
 package com.vira.authg.controller;
 
 import com.vira.authg.dto.ApiResponse;
+import com.vira.authg.dto.ApplicationAuthorizationDto;
 import com.vira.authg.dto.AuthResponse;
 import com.vira.authg.dto.LoginRequest;
 import com.vira.authg.dto.SignUpRequest;
@@ -9,7 +10,10 @@ import com.vira.authg.model.AuthProvider;
 import com.vira.authg.model.User;
 import com.vira.authg.repository.UserRepository;
 import com.vira.authg.security.TokenProvider;
+import com.vira.authg.service.AuthService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,15 +42,16 @@ public class AuthController {
     @Autowired
     private TokenProvider tokenProvider;
 
+    @Autowired
+    private AuthService authService;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -56,7 +61,7 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new BadRequestException("Email address already in use.");
         }
 
@@ -77,6 +82,13 @@ public class AuthController {
 
         return ResponseEntity.created(location)
                 .body(new ApiResponse(true, "User registered successfully@"));
+    }
+
+    @PostMapping("/authg/token")
+    public ResponseEntity<Void> generateAppToken(@RequestBody ApplicationAuthorizationDto data) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authService.generateAppToken(data));
+        return ResponseEntity.ok().headers(headers).build();
     }
 
 }

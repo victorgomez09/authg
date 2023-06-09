@@ -15,12 +15,10 @@ import lombok.NoArgsConstructor;
 @JsonInclude(Include.NON_NULL)
 public class ApplicationAuthorizationDto {
 
-    private Long id;
-
-    private String name;
-
     private String clientId;
 
     private String clientSecret;
+
+    private String token;
 
 }

@@ -2,7 +2,10 @@ package com.vira.authg.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,13 +38,13 @@ public class ApplicationController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApplicationDto> findById(@PathVariable("id") Long id) {
+    public ResponseEntity<ApplicationDto> findById(@PathVariable Long id) {
         return ResponseEntity.ok().body(service.findById(id));
     }
 
     @PostMapping("/authorize")
-    public ResponseEntity<ApplicationAuthorizationDto> authorize(@RequestBody ApplicationAuthorizationDto data) {
-        return ResponseEntity.ok().body(service.authorize(data));
+    public ResponseEntity<Boolean> authorize(HttpServletRequest request) {
+        return ResponseEntity.ok().body(service.authorize(request));
     }
 
     @PostMapping()
