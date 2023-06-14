@@ -41,7 +41,7 @@ public class TokenProvider {
 
         SecretKey key = Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId()))
+                .setSubject(userPrincipal.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 // .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())

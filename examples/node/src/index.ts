@@ -1,5 +1,5 @@
-import * as express from 'express'
-import { authgJwt } from '../'
+import express from 'express'
+import { authgJwt } from '../../../libraries/node'
 
 const app = express()
 
