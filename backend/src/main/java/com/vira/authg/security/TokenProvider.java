@@ -66,7 +66,7 @@ public class TokenProvider {
                 .compact();
     }
 
-    public Long getUserIdFromToken(String token) {
+    public String getUserEmailFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
         // Claims claims = Jwts.parser()
@@ -74,7 +74,7 @@ public class TokenProvider {
         // .parseClaimsJws(token)
         // .getBody();
 
-        return Long.parseLong(claims.getSubject());
+        return claims.getSubject();
     }
 
     public boolean validateToken(String authToken) {

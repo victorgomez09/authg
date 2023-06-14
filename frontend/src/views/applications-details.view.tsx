@@ -9,7 +9,7 @@ import { findAppById } from "../services/application.service"
 
 export default function ApplicationDetails() {
     const params = useParams()
-    const [selectedTab, setSelectedTab] = useState<"quickStart" | "settings">("settings")
+    const [selectedTab, setSelectedTab] = useState<"quickStart" | "settings" | "scopes">("settings")
     const { data, isLoading, error } = useCustomQuery<string | undefined, IApplication>(["findApplicationById"], () => findAppById(params.id), params.id)
 
     useEffect(() => {
@@ -68,12 +68,13 @@ export default function ApplicationDetails() {
                     <span className="font-light text-sm">Identifier {data?.identifier}</span>
                     <span className="font-light text-sm">{data?.type} application</span>
                 </div>
-                <div className="tabs tabs-boxed bg-base-100 w-48 shadow justify-center rounded-bl-none rounded-br-none">
+                <div className="tabs tabs-boxed bg-base-100 shadow justify-center rounded-bl-none rounded-br-none">
                     <a className={`tab ${selectedTab === "quickStart" ? "tab-active" : ""}`} onClick={() => setSelectedTab("quickStart")}>Quick start</a>
                     <a className={`tab ${selectedTab === "settings" ? "tab-active" : ""}`} onClick={() => setSelectedTab("settings")}>Settings</a>
+                    <a className={`tab ${selectedTab === "scopes" ? "tab-active" : ""}`} onClick={() => setSelectedTab("scopes")}>Scopes</a>
                 </div>
 
-                <div className="card bg-base-100 shadow w-full h-full rounded-tl-none">
+                <div className="card bg-base-100 shadow w-full h-full rounded-tl-none rounded-tr-none">
                     <div className="card-body overflow-auto">
                         {selectedTab === "quickStart" && (
                             <div className="flex flex-col gap-4">
@@ -93,7 +94,7 @@ export default function ApplicationDetails() {
                                     <br />
                                 </p>
                                 <div className="mt-4">
-                                    <pre className="rounded">
+                                    <pre className="card">
                                         <code className="language-js">{lines}</code>
                                     </pre>
                                 </div>

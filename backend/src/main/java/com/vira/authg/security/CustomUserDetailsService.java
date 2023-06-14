@@ -27,9 +27,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Transactional
-    public UserDetails loadUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User", "id", id));
+    public UserDetails loadUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("User", "email", email));
 
         return UserPrincipal.create(user);
     }

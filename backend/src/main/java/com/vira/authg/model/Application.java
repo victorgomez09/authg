@@ -3,12 +3,14 @@ package com.vira.authg.model;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -67,7 +69,8 @@ public class Application {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @ManyToMany(mappedBy = "applications")
+    @JoinTable(name = "application_users", joinColumns = @JoinColumn(name = "application_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<User> users;
 
     @CreationTimestamp

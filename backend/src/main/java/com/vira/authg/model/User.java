@@ -13,42 +13,37 @@ import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "email")
+                @UniqueConstraint(columnNames = "email")
 })
 @Getter
 @Setter
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(nullable = false)
-    private String name;
+        @Column(nullable = false)
+        private String name;
 
-    @Email
-    @Column(nullable = false)
-    private String email;
+        @Email
+        @Column(nullable = false)
+        private String email;
 
-    private String imageUrl;
+        private String imageUrl;
 
-    @Column(nullable = false)
-    private Boolean emailVerified = false;
+        @Column(nullable = false)
+        private Boolean emailVerified = false;
 
-    @JsonIgnore
-    private String password;
+        @JsonIgnore
+        private String password;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private AuthProvider provider;
+        @NotNull
+        @Enumerated(EnumType.STRING)
+        private AuthProvider provider;
 
-    private String providerId;
+        private String providerId;
 
-    @ManyToMany(cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
-    @JoinTable(name = "user_applications", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
-            @JoinColumn(name = "application_id") })
-    private List<Application> applications;
+        @ManyToMany(mappedBy = "users")
+        private List<Application> applications;
 
 }
