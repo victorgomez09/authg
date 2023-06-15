@@ -8,3 +8,10 @@ export async function getUsers(): Promise<IUser[]> {
         method: 'GET',
     });
 }
+
+export async function findUserById(id: number): Promise<IUser> {
+    return request<IUser>({
+        url: API_BASE_URL + "/api/v1/users/" + id,
+        method: 'GET',
+    });
+}

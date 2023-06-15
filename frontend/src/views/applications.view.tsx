@@ -62,7 +62,6 @@ export default function Applications() {
                                     </tbody>
                                 </table>
                             </div>
-
                         </div>
                     ) : (
                         <div className="mt-10">

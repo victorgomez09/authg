@@ -6,12 +6,14 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -24,52 +26,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "applications", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "name", "client_id" })
+@Table(name = "application_scope", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "scope" })
 })
 @NoArgsConstructor
 @Data
 @Builder
 @AllArgsConstructor
-public class Application {
+public class ApplicationScope {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "scope")
+    private String scope;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "type")
-    private ApplicationType type;
+    @JoinColumn(name = "fk_application", nullable = false)
+    @ManyToOne(optional = false, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Application application;
 
-    @Column(name = "identifier")
-    private String identifier;
-
-    @Column(name = "signing_algorithm")
-    private SigningAlgorithm signingAlgorithm;
-
-    @Column(name = "token_expiration")
-    private Long tokenExpiration;
-
-    @Column(name = "domain")
-    private String domain;
-
-    @Column(name = "client_id")
-    private String clientId;
-
-    @Column(name = "client_secret")
-    private String clientSecret;
-
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "application")
-    private List<ApplicationScope> scopes;
+    @JoinTable(name = "application_scope_users", joinColumns = @JoinColumn(name = "application_scope_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<User> users;
 
     @CreationTimestamp
     @Column(name = "creation_date")

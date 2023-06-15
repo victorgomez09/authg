@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,8 +35,14 @@ public class UserController {
 
     @GetMapping("/api/v1/users/list")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
+    public ResponseEntity<List<UserDto>> findAllUsers() {
         return ResponseEntity.ok().body(userService.findAll());
+    }
+
+    @GetMapping("/api/v1/users/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<UserDto> findUserById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(userService.findUserById(id));
     }
 
 }

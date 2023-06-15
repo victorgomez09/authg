@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {
@@ -44,6 +48,13 @@ public class User {
         private String providerId;
 
         @ManyToMany(mappedBy = "users")
-        private List<Application> applications;
+        private List<ApplicationScope> applicationScopes;
 
+        @CreationTimestamp
+        @Column(name = "creation_date")
+        private Date creationDate;
+
+        @UpdateTimestamp
+        @Column(name = "update_date")
+        private Date updateDate;
 }

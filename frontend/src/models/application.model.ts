@@ -1,5 +1,7 @@
+import { IUser } from "./user.model";
+
 export interface IApplication {
-    id: string;
+    id: number;
     name: string;
     description: string;
     type: "API" | "WEB";
@@ -9,6 +11,8 @@ export interface IApplication {
     domain: string;
     clientId: string;
     clientSecret: string;
+    users: IUser[]
+    scopes: IApplicationScopes[]
 }
 
 export interface ICreateApplication {
@@ -18,4 +22,17 @@ export interface ICreateApplication {
     identifier: string;
     signingAlgorithm: "RS256" | "HS256";
     tokenExpiration: number;
+}
+
+export interface IApplicationScopes {
+    id: number;
+    scope: string;
+    description: string;
+    application: IApplication;
+}
+
+export interface IAddApplicationScopes {
+    id: number;
+    scope: string;
+    description: string;
 }

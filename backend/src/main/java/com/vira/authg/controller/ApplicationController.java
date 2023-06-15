@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vira.authg.dto.ApplicationAuthorizationDto;
 import com.vira.authg.dto.ApplicationCreateDto;
 import com.vira.authg.dto.ApplicationDto;
+import com.vira.authg.dto.ApplicationScopesDto;
 import com.vira.authg.dto.ApplicationUpdateDto;
 import com.vira.authg.security.CurrentUser;
 import com.vira.authg.security.UserPrincipal;
@@ -35,6 +36,11 @@ public class ApplicationController {
     @GetMapping("/user")
     public ResponseEntity<List<ApplicationDto>> findAllByUser(@RequestParam String email) {
         return ResponseEntity.ok().body(service.findAllByUser(email));
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<List<ApplicationDto>> findAllByType(@RequestParam("type") String type) {
+        return ResponseEntity.ok().body(service.findAllByType(type));
     }
 
     @GetMapping("/{id}")
@@ -56,6 +62,12 @@ public class ApplicationController {
     @PutMapping()
     public ResponseEntity<ApplicationDto> update(@RequestBody ApplicationUpdateDto data) {
         return ResponseEntity.ok().body(service.update(data));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<List<ApplicationScopesDto>> addScopes(@PathVariable Long id,
+            @RequestBody ApplicationScopesDto data) {
+        return ResponseEntity.ok().body(service.addApplicationScopes(id, data));
     }
 
     @DeleteMapping("/{id}")

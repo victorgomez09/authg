@@ -14,6 +14,7 @@ import Applications from './views/applications.view'
 import ApplicationsCreate from './views/applications-create.view'
 import ApplicationDetails from './views/applications-details.view'
 import Users from './views/users.view'
+import UserDetails from './views/user-details.view'
 
 function App() {
   const queryClient = new QueryClient()
@@ -30,10 +31,13 @@ function App() {
       <Routes>
         <Route element={<PrivateRoute />}>
           <Route path='/' element={<Home />} />
+
           <Route path='/applications' element={<Applications />} />
           <Route path='/applications/create' element={<ApplicationsCreate />} />
           <Route path='/applications/:id' element={<ApplicationDetails />} />
+
           <Route path='/users' element={<Users />} />
+          <Route path='/users/:id' element={<UserDetails />} />
         </Route>
 
         <Route path="/login" element={<Login />} />

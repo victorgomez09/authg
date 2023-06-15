@@ -1,8 +1,10 @@
-import { IApplication } from "./application.model";
+import { IApplicationScopes } from "./application.model";
 
 export interface IUser {
+    id: number;
     name: string;
     email: string;
-    applications: IApplication[]
-
+    scopes: IApplicationScopes[]
+    creationDate: Date
+    updateDate: Date
 }

@@ -19,5 +19,5 @@ public class UserDto {
 
     private String email;
 
-    private List<ApplicationDto> applications;
+    private List<ApplicationScopesDto> applicationScopes;
 }

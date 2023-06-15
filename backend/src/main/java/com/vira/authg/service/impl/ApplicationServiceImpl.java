@@ -1,6 +1,5 @@
 package com.vira.authg.service.impl;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,14 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vira.authg.dto.ApplicationCreateDto;
 import com.vira.authg.dto.ApplicationDto;
+import com.vira.authg.dto.ApplicationScopesDto;
 import com.vira.authg.dto.ApplicationUpdateDto;
+import com.vira.authg.dto.UserDto;
 import com.vira.authg.exception.ResourceDuplicateException;
 import com.vira.authg.exception.ResourceNotFoundException;
 import com.vira.authg.model.Application;
+import com.vira.authg.model.ApplicationScope;
 import com.vira.authg.model.ApplicationType;
 import com.vira.authg.model.SigningAlgorithm;
 import com.vira.authg.model.User;
 import com.vira.authg.repository.ApplicationRepository;
+import com.vira.authg.repository.ApplicationScopeRepository;
 import com.vira.authg.repository.UserRepository;
 import com.vira.authg.security.TokenProvider;
 import com.vira.authg.service.ApplicationService;
@@ -30,6 +33,8 @@ public class ApplicationServiceImpl implements ApplicationService {
     private ApplicationRepository repository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ApplicationScopeRepository applicationScopeRepository;
     @Autowired
     private ApplicationUtils utils;
     @Autowired
@@ -44,7 +49,12 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .type(app.getType()).signingAlgorithm(app.getSigningAlgorithm())
                 .identifier(app.getIdentifier()).tokenExpiration(app.getTokenExpiration())
                 .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
-                .owner(app.getOwner())
+                .owner(UserDto.builder().id(app.getOwner().getId()).email(app.getOwner().getEmail())
+                        .name(app.getOwner().getName()).build())
+                .scopes(app.getScopes().stream()
+                        .map(s -> ApplicationScopesDto.builder().scope(s.getScope()).description(s.getDescription())
+                                .build())
+                        .collect(Collectors.toList()))
                 .creationDate(app.getCreationDate()).build();
     }
 
@@ -62,7 +72,37 @@ public class ApplicationServiceImpl implements ApplicationService {
                         .tokenExpiration(app.getTokenExpiration())
                         .domain(app.getDomain()).clientId(app.getClientId())
                         .clientSecret(app.getClientSecret())
-                        .owner(app.getOwner())
+                        .owner(UserDto.builder().id(app.getOwner().getId())
+                                .email(app.getOwner().getEmail())
+                                .name(app.getOwner().getName()).build())
+                        .scopes(app.getScopes().stream()
+                                .map(s -> ApplicationScopesDto.builder().scope(s.getScope())
+                                        .description(s.getDescription())
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .creationDate(app.getCreationDate()).build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ApplicationDto> findAllByType(String type) {
+        return repository.findByType(ApplicationType.valueOf(type.toUpperCase())).stream()
+                .map(app -> ApplicationDto.builder().id(app.getId()).name(app.getName())
+                        .type(app.getType())
+                        .signingAlgorithm(app.getSigningAlgorithm())
+                        .description(app.getDescription())
+                        .identifier(app.getIdentifier())
+                        .tokenExpiration(app.getTokenExpiration())
+                        .domain(app.getDomain()).clientId(app.getClientId())
+                        .clientSecret(app.getClientSecret())
+                        .owner(UserDto.builder().id(app.getOwner().getId())
+                                .email(app.getOwner().getEmail())
+                                .name(app.getOwner().getName()).build())
+                        .scopes(app.getScopes().stream()
+                                .map(s -> ApplicationScopesDto.builder().scope(s.getScope())
+                                        .description(s.getDescription())
+                                        .build())
+                                .collect(Collectors.toList()))
                         .creationDate(app.getCreationDate()).build())
                 .collect(Collectors.toList());
     }
@@ -75,7 +115,8 @@ public class ApplicationServiceImpl implements ApplicationService {
         return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
                 .identifier(app.getIdentifier()).tokenExpiration(app.getTokenExpiration())
                 .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
-                .owner(app.getOwner())
+                .owner(UserDto.builder().id(app.getOwner().getId()).email(app.getOwner().getEmail())
+                        .name(app.getOwner().getName()).build())
                 .creationDate(app.getCreationDate()).build();
     }
 
@@ -112,17 +153,14 @@ public class ApplicationServiceImpl implements ApplicationService {
                         .clientId(utils.generateApplicationClientId())
                         .clientSecret(utils.generateApplicationClientSecret())
                         .owner(user)
-                        .users(Arrays.asList(user))
                         .build());
-
-        // user.setApplications(Arrays.asList(app));
-        // userRepository.save(user);
 
         return ApplicationDto.builder().id(app.getId()).name(app.getName()).description(app.getDescription())
                 .identifier(app.getIdentifier()).type(app.getType())
                 .tokenExpiration(app.getTokenExpiration())
                 .domain(app.getDomain()).clientId(app.getClientId()).clientSecret(app.getClientSecret())
-                .owner(app.getOwner())
+                .owner(UserDto.builder().id(app.getOwner().getId()).email(app.getOwner().getEmail())
+                        .name(app.getOwner().getName()).build())
                 .creationDate(app.getCreationDate()).build();
     }
 
@@ -130,6 +168,24 @@ public class ApplicationServiceImpl implements ApplicationService {
     public ApplicationDto update(ApplicationUpdateDto data) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    @Override
+    public List<ApplicationScopesDto> addApplicationScopes(Long id, ApplicationScopesDto data) {
+        Application app = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Application", "id", id));
+
+        ApplicationScope appScope = applicationScopeRepository.save(ApplicationScope.builder().scope(data.getScope())
+                .description(data.getDescription()).application(app).build());
+        List<ApplicationScope> currentScopes = app.getScopes();
+        currentScopes.add(appScope);
+        app.setScopes(currentScopes);
+
+        repository.save(app);
+
+        return app.getScopes().stream()
+                .map(s -> ApplicationScopesDto.builder().scope(s.getScope()).description(s.getDescription()).build())
+                .collect(Collectors.toList());
     }
 
     @Override

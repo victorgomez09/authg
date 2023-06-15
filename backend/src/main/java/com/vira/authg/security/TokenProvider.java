@@ -44,20 +44,18 @@ public class TokenProvider {
                 .setSubject(userPrincipal.getEmail())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                // .signWith(SignatureAlgorithm.HS512, appProperties.getAuth().getTokenSecret())
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    public String createApplicationToken(Long applicationId, String applicationName, String applicationAudience,
+    public String createApplicationToken(String userEmail, String applicationAudience,
             String applicationIssuer) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + appProperties.getAuth().getTokenExpirationMsec());
 
         SecretKey key = Keys.hmacShaKeyFor(appProperties.getAuth().getTokenSecret().getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .setSubject(Long.toString(applicationId))
-                .setSubject(applicationName)
+                .setSubject(userEmail)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .setAudience(applicationAudience)

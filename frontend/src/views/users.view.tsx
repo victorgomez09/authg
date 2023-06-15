@@ -47,13 +47,13 @@ export default function Users() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data?.map((app, index) => {
+                                        {data?.map((user, index) => {
                                             return (
                                                 <tr className="hover" key={index}>
                                                     <th>{index}</th>
-                                                    <td><Link to={`/applications/${app.name}`} className="hover:text-primary cursor-pointer">{app.name}</Link></td>
-                                                    <td>{app.email}</td>
-                                                    <td>{app.applications.map((app, index) => {
+                                                    <td><Link to={`/users/${user.id}`} className="hover:text-primary cursor-pointer">{user.name}</Link></td>
+                                                    <td>{user.email}</td>
+                                                    <td>{user.applications.map((app, index) => {
                                                         return (
                                                             <span key={index}>{app.name}</span>
                                                         )

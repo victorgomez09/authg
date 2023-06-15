@@ -1,6 +1,7 @@
 package com.vira.authg.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import com.vira.authg.model.ApplicationType;
 import com.vira.authg.model.SigningAlgorithm;
@@ -37,7 +38,11 @@ public class ApplicationDto {
 
     private String clientSecret;
 
-    private User owner;
+    private UserDto owner;
+
+    private List<UserDto> users;
+
+    private List<ApplicationScopesDto> scopes;
 
     private Date creationDate;
 

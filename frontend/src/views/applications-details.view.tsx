@@ -3,14 +3,17 @@ import { useParams } from "react-router-dom"
 import Prism from 'prismjs'
 import "prismjs/themes/prism-tomorrow.css"
 
-import { useCustomQuery } from "../hooks/query.hook"
-import { IApplication } from "../models/application.model"
-import { findAppById } from "../services/application.service"
+import { useCustomMutation, useCustomQuery } from "../hooks/query.hook"
+import { IAddApplicationScopes, IApplication, IApplicationScopes } from "../models/application.model"
+import { addScopes, findAppById } from "../services/application.service"
+import { SubmitHandler, useForm } from "react-hook-form"
 
 export default function ApplicationDetails() {
     const params = useParams()
     const [selectedTab, setSelectedTab] = useState<"quickStart" | "settings" | "scopes">("settings")
-    const { data, isLoading, error } = useCustomQuery<string | undefined, IApplication>(["findApplicationById"], () => findAppById(params.id), params.id)
+    const { data: appData, isLoading, error } = useCustomQuery<string | undefined, IApplication>(["findApplicationById"], () => findAppById(params.id), params.id)
+    const { register, handleSubmit, formState: { errors } } = useForm<IAddApplicationScopes>({ mode: "onTouched" });
+    const { mutate } = useCustomMutation<IAddApplicationScopes, IApplicationScopes[]>((data) => addScopes(data), ["findApplicationById"])
 
     useEffect(() => {
         Prism.highlightAll();
@@ -42,13 +45,17 @@ export default function ApplicationDetails() {
         "console.log('Running on port ', port);"
     ].join("\n").trim();
 
+    const sendForm: SubmitHandler<IAddApplicationScopes> = async (data) => {
+        const payload = { ...data, id: appData?.id || 0 }
+        mutate(payload)
+    }
+
     if (isLoading) return (
         <div className="flex flex-1 items-center justify-center">
             <span className="loading loading-dots loading-lg"></span>
         </div>
     )
 
-    console.log(lines)
     return (
         <>
             {error && (
@@ -64,9 +71,9 @@ export default function ApplicationDetails() {
 
             <div className="flex flex-col justify-center">
                 <div className="flex flex-col mb-4">
-                    <h2 className="font-semibold text-2xl">{data?.name.toUpperCase()}</h2>
-                    <span className="font-light text-sm">Identifier {data?.identifier}</span>
-                    <span className="font-light text-sm">{data?.type} application</span>
+                    <h2 className="font-semibold text-2xl">{appData?.name.toUpperCase()}</h2>
+                    <span className="font-light text-sm">Identifier {appData?.identifier}</span>
+                    <span className="font-light text-sm">{appData?.type} application</span>
                 </div>
                 <div className="tabs tabs-boxed bg-base-100 shadow justify-center rounded-bl-none rounded-br-none">
                     <a className={`tab ${selectedTab === "quickStart" ? "tab-active" : ""}`} onClick={() => setSelectedTab("quickStart")}>Quick start</a>
@@ -107,21 +114,21 @@ export default function ApplicationDetails() {
                                     <label className="label">
                                         <span className="label-text">Name</span>
                                     </label>
-                                    <input disabled type="text" className={`input input-bordered w-full`} value={data?.name} />
+                                    <input disabled type="text" className={`input input-bordered w-full`} value={appData?.name} />
                                 </div>
 
                                 <div className="form-control w-full">
                                     <label className="label">
                                         <span className="label-text">Description</span>
                                     </label>
-                                    <textarea disabled className={`textarea textarea-bordered w-full`} value={data?.description} />
+                                    <textarea disabled className={`textarea textarea-bordered w-full`} value={appData?.description} />
                                 </div>
 
                                 <div className="form-control w-full">
                                     <label className="label">
                                         <span className="label-text">Identifier</span>
                                     </label>
-                                    <input disabled type="text" className={`input input-bordered w-full`} value={data?.identifier} />
+                                    <input disabled type="text" className={`input input-bordered w-full`} value={appData?.identifier} />
                                     <label className="label">
                                         <span className="label-text">Unique identifier for the API. This value will be used as the audience parameter on authorization calls.</span>
                                     </label>
@@ -132,7 +139,7 @@ export default function ApplicationDetails() {
                                         <span className="label-text">Type</span>
                                     </label>
                                     <select disabled className={`select select-bordered`}>
-                                        <option selected value={data?.type}>{data?.type}</option>
+                                        <option selected value={appData?.type}>{appData?.type}</option>
                                     </select>
                                 </div>
 
@@ -141,7 +148,7 @@ export default function ApplicationDetails() {
                                         <span className="label-text">Signing algorithm</span>
                                     </label>
                                     <select disabled className={`select select-bordered`}>
-                                        <option selected value={data?.signingAlgorithm}>{data?.signingAlgorithm}</option>
+                                        <option selected value={appData?.signingAlgorithm}>{appData?.signingAlgorithm}</option>
                                     </select>
                                 </div>
 
@@ -149,21 +156,88 @@ export default function ApplicationDetails() {
                                     <label className="label">
                                         <span className="label-text">Domain</span>
                                     </label>
-                                    <input disabled type="text" className={`input input-bordered w-full`} value={`${data?.domain}/authorize`} />
+                                    <input disabled type="text" className={`input input-bordered w-full`} value={`${appData?.domain}/authorize`} />
                                 </div>
 
                                 <div className="form-control w-full">
                                     <label className="label">
                                         <span className="label-text">Client ID</span>
                                     </label>
-                                    <input disabled type="text" className={`input input-bordered w-full`} value={data?.clientId} />
+                                    <input disabled type="text" className={`input input-bordered w-full`} value={appData?.clientId} />
                                 </div>
 
                                 <div className="form-control w-full">
                                     <label className="label">
                                         <span className="label-text">Secret</span>
                                     </label>
-                                    <input disabled type="text" className={`input input-bordered w-full`} value={data?.clientSecret} />
+                                    <input disabled type="text" className={`input input-bordered w-full`} value={appData?.clientSecret} />
+                                </div>
+                            </div>
+                        )}
+
+                        {selectedTab === "scopes" && (
+                            <div className="flex flex-col gap-6">
+                                <form noValidate onSubmit={handleSubmit(sendForm)}>
+                                    <div className={`flex ${errors.scope || errors.description ? 'items-center' : 'items-end'} gap-4`}>
+                                        <div className="form-control w-full">
+                                            <label className="label">
+                                                <span className="label-text">Permission (scope)</span>
+                                            </label>
+                                            <input type="text" placeholder="read:getUsers" className={`input input-bordered w-full`} {...register("scope", {
+                                                required: {
+                                                    value: true,
+                                                    message: "Permission is required"
+                                                }
+                                            })} />
+                                            {errors.scope && (
+                                                <label className="label">
+                                                    <span className="label-text-alt italic text-error">{errors.scope.message}</span>
+                                                </label>
+                                            )}
+                                        </div>
+
+                                        <div className="form-control w-full">
+                                            <label className="label">
+                                                <span className="label-text">Description</span>
+                                            </label>
+                                            <input type="text" placeholder="Get all users" className={`input input-bordered w-full`} {...register("description", {
+                                                required: {
+                                                    value: true,
+                                                    message: "Description is required"
+                                                }
+                                            })} />
+                                            {errors.description && (
+                                                <label className="label">
+                                                    <span className="label-text-alt italic text-error">{errors.description.message}</span>
+                                                </label>
+                                            )}
+                                        </div>
+
+                                        <button type="submit" className="btn btn-primary">Add</button>
+                                    </div>
+                                </form>
+
+                                <div className="divider"></div>
+
+                                <div className="overflow-x-auto">
+                                    <table className="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Permission</th>
+                                                <th>Description</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {appData?.scopes.map((scope, index) => {
+                                                return (
+                                                    <tr className="hover" key={index}>
+                                                        <td><div className="badge">{scope.scope}</div></td>
+                                                        <td>{scope.description}</td>
+                                                    </tr>
+                                                )
+                                            })}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         )}

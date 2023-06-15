@@ -9,7 +9,9 @@ import com.vira.authg.exception.BadRequestException;
 import com.vira.authg.model.AuthProvider;
 import com.vira.authg.model.User;
 import com.vira.authg.repository.UserRepository;
+import com.vira.authg.security.CurrentUser;
 import com.vira.authg.security.TokenProvider;
+import com.vira.authg.security.UserPrincipal;
 import com.vira.authg.service.AuthService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -85,9 +86,10 @@ public class AuthController {
     }
 
     @PostMapping("/authg/token")
-    public ResponseEntity<Void> generateAppToken(@RequestBody ApplicationAuthorizationDto data) {
+    public ResponseEntity<Void> generateAppToken(@RequestBody ApplicationAuthorizationDto data,
+            @CurrentUser UserPrincipal userPrincipal) {
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authService.generateAppToken(data));
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authService.generateAppToken(data, userPrincipal));
         return ResponseEntity.ok().headers(headers).build();
     }
 
