@@ -39,8 +39,8 @@ export default function Login() {
         </div>
       )}
       <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content text-center w-12/12 md:w-6/12 lg:w-5/12 xl:w-4/12">
-          <div className="card w-full bg-base-100 shadow-md">
+        <div className="hero-content text-center">
+          <div className="card bg-base-100 shadow-md w-60 sm:w-96">
             <div className="card-body">
               <h2 className="card-title text-center inline">Welcome</h2>
               <h2 className="text-center font-thin">Sign in to AuthG to continue to AuthG</h2>

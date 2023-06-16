@@ -1,7 +1,5 @@
 package com.vira.authg.dto;
 
-import com.vira.authg.dto.ApplicationDto.ApplicationDtoBuilder;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

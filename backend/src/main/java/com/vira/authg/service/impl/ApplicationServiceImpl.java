@@ -52,7 +52,8 @@ public class ApplicationServiceImpl implements ApplicationService {
                 .owner(UserDto.builder().id(app.getOwner().getId()).email(app.getOwner().getEmail())
                         .name(app.getOwner().getName()).build())
                 .scopes(app.getScopes().stream()
-                        .map(s -> ApplicationScopesDto.builder().scope(s.getScope()).description(s.getDescription())
+                        .map(s -> ApplicationScopesDto.builder().scope(s.getScope())
+                                .description(s.getDescription())
                                 .build())
                         .collect(Collectors.toList()))
                 .creationDate(app.getCreationDate()).build();

@@ -11,7 +11,9 @@ import com.vira.authg.dto.ApplicationScopesDto;
 import com.vira.authg.dto.UserDto;
 import com.vira.authg.exception.ResourceNotFoundException;
 import com.vira.authg.model.Application;
+import com.vira.authg.model.ApplicationScope;
 import com.vira.authg.model.User;
+import com.vira.authg.repository.ApplicationRepository;
 import com.vira.authg.repository.UserRepository;
 import com.vira.authg.service.UserService;
 
@@ -20,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ApplicationRepository applicationRepository;
 
     @Override
     public List<UserDto> findAll() {
@@ -27,10 +31,15 @@ public class UserServiceImpl implements UserService {
                 .map(user -> UserDto.builder().id(user.getId()).name(user.getName())
                         .email(user.getEmail())
                         .applicationScopes(user.getApplicationScopes().stream()
-                                .map(s -> ApplicationScopesDto.builder().scope(s.getScope())
+                                .map(s -> ApplicationScopesDto.builder()
+                                        .scope(s.getScope())
                                         .description(s.getDescription())
-                                        .application(ApplicationDto.builder().id(s.getApplication().getId())
-                                                .name(s.getApplication().getName()).build())
+                                        .application(ApplicationDto.builder()
+                                                .id(s.getApplication()
+                                                        .getId())
+                                                .name(s.getApplication()
+                                                        .getName())
+                                                .build())
                                         .build())
                                 .collect(Collectors.toList()))
                         .build())
@@ -44,9 +53,12 @@ public class UserServiceImpl implements UserService {
 
         return UserDto.builder().id(user.getId()).email(user.getEmail()).name(user.getName())
                 .applicationScopes(user.getApplicationScopes().stream()
-                        .map(s -> ApplicationScopesDto.builder().scope(s.getScope()).description(s.getDescription())
-                                .application(ApplicationDto.builder().id(s.getApplication().getId())
-                                        .name(s.getApplication().getName()).build())
+                        .map(s -> ApplicationScopesDto.builder().scope(s.getScope())
+                                .description(s.getDescription())
+                                .application(ApplicationDto.builder()
+                                        .id(s.getApplication().getId())
+                                        .name(s.getApplication().getName())
+                                        .build())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
@@ -60,6 +72,30 @@ public class UserServiceImpl implements UserService {
         // user.setApplications(apps);
         // return userRepository.save(user);
         return null;
+    }
+
+    @Override
+    public UserDto addUserScopes(Long id, List<ApplicationScopesDto> data) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+
+        user.setApplicationScopes(data.stream().map(s -> ApplicationScope.builder().scope(s.getScope())
+                .description(s.getDescription()).application(applicationRepository.getById(s.getApplication().getId()))
+                .build()).collect(Collectors.toList()));
+
+        user = userRepository.save(user);
+
+        return UserDto.builder().id(user.getId()).email(user.getEmail()).name(user.getName())
+                .applicationScopes(user.getApplicationScopes().stream()
+                        .map(s -> ApplicationScopesDto.builder().scope(s.getScope())
+                                .description(s.getDescription())
+                                .application(ApplicationDto.builder()
+                                        .id(s.getApplication().getId())
+                                        .name(s.getApplication().getName())
+                                        .build())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build();
     }
 
 }

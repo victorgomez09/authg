@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://8080-victorgomez09-authg-9nlcliyhlbt.ws-eu99.gitpod.io';
+export const API_BASE_URL = 'https://8080-victorgomez09-authg-9nlcliyhlbt.ws-eu100.gitpod.io';
 export const ACCESS_TOKEN = 'accessToken';
 
 export const OAUTH2_REDIRECT_URI = 'https://8080-victorgomez09-authg-9nlcliyhlbt.ws-eu98.gitpod.io/oauth2/redirect'

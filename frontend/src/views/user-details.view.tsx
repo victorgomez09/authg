@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { useCustomQuery } from "../hooks/query.hook"
+import { useCustomMutation, useCustomQuery } from "../hooks/query.hook"
 import { IUser } from "../models/user.model"
-import { findUserById } from "../services/users.service"
+import { addUserScopes, findUserById } from "../services/users.service"
 import { IApplication, IApplicationScopes } from "../models/application.model"
 import { findAppsByType } from "../services/application.service"
 
@@ -14,11 +14,12 @@ export default function UserDetails() {
     const { data: userData, isLoading: userIsLoading, error: userError } = useCustomQuery<string | undefined, IUser>(["findUserById"], () => findUserById(Number(params.id)), params.id)
     const { data: appData, isLoading: appsIsLoading, error: appsError } = useCustomQuery<string | undefined, IApplication[]>(["findApplicationsByUserAndType"],
         () => findAppsByType("api"), "api")
+    const { mutate } = useCustomMutation<IApplicationScopes[], IUser>((data) => addUserScopes(Number(params.id), data), ["findUserById"])
 
 
     useEffect(() => {
-        console.log({ selectedScopes })
-    }, [selectedScopes])
+        if (userData) setSelectedScopes(userData?.applicationScopes)
+    }, [userData])
 
     if (userIsLoading || appsIsLoading) return (
         <div className="flex flex-1 items-center justify-center">
@@ -27,13 +28,20 @@ export default function UserDetails() {
     )
 
     const updateSelectedScopes = (scope: IApplicationScopes) => {
+        scope.application = selectedApp!
         const index = selectedScopes.findIndex(({ id }) => id === scope.id);
         const newSelectedScopesArray = index === -1
             ? [...selectedScopes, scope]
             : [...selectedScopes.slice(0, index), ...selectedScopes.slice(index + 1)];
-        setSelectedScopes(newSelectedScopesArray);
+        setSelectedScopes(newSelectedScopesArray)
     }
 
+    const sendForm = () => {
+        console.log({ selectedScopes })
+        mutate(selectedScopes)
+    }
+
+    console.log('selectedApp?.scopes', selectedApp?.scopes)
     return (
         <>
             {userError || appsError && (
@@ -110,7 +118,7 @@ export default function UserDetails() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {userData?.scopes?.map((scope, index) => {
+                                            {userData?.applicationScopes?.map((scope, index) => {
                                                 return (
                                                     <tr className="hover" key={index}>
                                                         <td><div className="badge">{scope.scope}</div></td>
@@ -129,7 +137,7 @@ export default function UserDetails() {
             </div>
 
             <dialog id="add_premission_modal" className="modal">
-                <form method="dialog" className="modal-box">
+                <form method="dialog" className="modal-box" onSubmit={() => sendForm()}>
                     <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     <h3 className="font-bold text-lg">Add permissions</h3>
                     <div className="flex flex-col mt-4">
@@ -137,22 +145,17 @@ export default function UserDetails() {
                             <label className="label">
                                 <span className="label-text">Select permissions from existing APIs</span>
                             </label>
-                            <select className="select select-bordered" onChange={(e) => setSelectedApp(appData?.filter(app => app.id === Number(e.target.value))[0])}>
-                                <option disabled selected>Pick one</option>
+                            <select className="select select-bordered" onChange={(e) => setSelectedApp(appData?.filter(app => app.id === Number(e.target.value))[0])} defaultValue="">
+                                <option disabled value="">Pick one</option>
                                 {appData?.map((app, index) => (
-                                    <option value={app.id} key={index}>
-                                        <div className="flex flex-col">
-                                            <span>{app.name}</span>
-                                            {/* <p className="font-thin">{app.identifier}</p> */}
-                                        </div>
-                                    </option>
+                                    <option value={app.id} key={index}>{app.name}</option>
                                 ))}
                             </select>
                         </div>
                     </div>
 
                     {selectedApp != null && (
-                        <form noValidate className="flex flex-col">
+                        <div className="flex flex-col">
                             <div className="overflow-x-auto mt-4">
                                 <table className="table">
                                     <thead>
@@ -168,7 +171,7 @@ export default function UserDetails() {
                                                 <tr className="hover" key={index}>
                                                     <td><div className="badge">{scope.scope}</div></td>
                                                     <td>{scope.description}</td>
-                                                    <td><input type="checkbox" className="checkbox" checked={userData?.scopes && userData?.scopes.filter(s => s.id === scope.id).length > 0}
+                                                    <td><input type="checkbox" className="checkbox" checked={selectedScopes.filter(s => s.id === scope.id).length > 0}
                                                         onChange={() => updateSelectedScopes(scope)} /></td>
                                                 </tr>
                                             )
@@ -178,7 +181,7 @@ export default function UserDetails() {
                             </div>
 
                             <button type="submit" className="btn btn-sm btn-primary mt-4 self-end">Add permissions</button>
-                        </form>
+                        </div>
                     )}
                 </form>
                 <form method="dialog" className="modal-backdrop">

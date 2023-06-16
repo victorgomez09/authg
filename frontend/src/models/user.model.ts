@@ -4,7 +4,7 @@ export interface IUser {
     id: number;
     name: string;
     email: string;
-    scopes: IApplicationScopes[]
+    applicationScopes: IApplicationScopes[]
     creationDate: Date
     updateDate: Date
 }

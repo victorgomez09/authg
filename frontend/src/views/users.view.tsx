@@ -53,11 +53,11 @@ export default function Users() {
                                                     <th>{index}</th>
                                                     <td><Link to={`/users/${user.id}`} className="hover:text-primary cursor-pointer">{user.name}</Link></td>
                                                     <td>{user.email}</td>
-                                                    <td>{user.applications.map((app, index) => {
+                                                    {/* <td>{user.applications.map((app, index) => {
                                                         return (
                                                             <span key={index}>{app.name}</span>
                                                         )
-                                                    })}</td>
+                                                    })}</td> */}
                                                 </tr>
                                             )
                                         })}
